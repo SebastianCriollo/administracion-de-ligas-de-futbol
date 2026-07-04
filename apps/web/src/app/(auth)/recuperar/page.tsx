@@ -1,6 +1,7 @@
-import { Button, Card, CardContent, Input, Label } from "@ligas/ui";
+import { Card, CardContent } from "@ligas/ui";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ForgotForm } from "@/components/auth/forgot-form";
 
 export const metadata: Metadata = { title: "Recuperar contraseña" };
 
@@ -13,12 +14,8 @@ export default function ForgotPasswordPage() {
       </p>
 
       <Card className="mt-6">
-        <CardContent className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="email">Correo electrónico</Label>
-            <Input id="email" type="email" placeholder="tu@correo.com" autoComplete="email" />
-          </div>
-          <Button className="w-full">Enviar enlace</Button>
+        <CardContent>
+          <ForgotForm />
         </CardContent>
       </Card>
 

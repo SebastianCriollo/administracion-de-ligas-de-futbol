@@ -48,6 +48,7 @@ model User {
 
   memberships    Membership[]
   refreshTokens  RefreshToken[]
+  passwordResets PasswordResetToken[]
   playerProfiles Player[]
   refereeProfile Referee[]
   teamStaff      TeamStaff[]
@@ -66,6 +67,19 @@ model RefreshToken {
   revokedAt DateTime?
   userAgent String?
   ip        String?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
   createdAt DateTime  @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

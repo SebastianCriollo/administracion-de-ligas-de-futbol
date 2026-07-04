@@ -28,11 +28,13 @@ export type RegisterInput = z.infer<typeof registerSchema>;
 export const forgotPasswordSchema = z.object({
   email: z.string().email().toLowerCase(),
 });
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 
 export const resetPasswordSchema = z.object({
   token: z.string().min(1),
   password: passwordSchema,
 });
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 
 export const acceptInvitationSchema = z.object({
   token: z.string().min(1),
@@ -40,10 +42,12 @@ export const acceptInvitationSchema = z.object({
   lastName: z.string().min(2).max(60),
   password: passwordSchema,
 });
+export type AcceptInvitationInput = z.infer<typeof acceptInvitationSchema>;
 
-export const refreshSchema = z.object({
-  refreshToken: z.string().min(1),
+export const googleLoginSchema = z.object({
+  idToken: z.string().min(1),
 });
+export type GoogleLoginInput = z.infer<typeof googleLoginSchema>;
 
 /** Payload del access token (JWT). */
 export interface AccessTokenPayload {

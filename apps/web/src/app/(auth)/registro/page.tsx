@@ -1,6 +1,7 @@
-import { Button, Card, CardContent, Input, Label } from "@ligas/ui";
+import { Card, CardContent } from "@ligas/ui";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { RegisterForm } from "@/components/auth/register-form";
 
 export const metadata: Metadata = { title: "Crear organización" };
 
@@ -13,43 +14,8 @@ export default function RegisterPage() {
       </p>
 
       <Card className="mt-6">
-        <CardContent className="flex flex-col gap-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="firstName" required>
-                Nombre
-              </Label>
-              <Input id="firstName" autoComplete="given-name" />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="lastName" required>
-                Apellido
-              </Label>
-              <Input id="lastName" autoComplete="family-name" />
-            </div>
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="email" required>
-              Correo electrónico
-            </Label>
-            <Input id="email" type="email" placeholder="tu@correo.com" autoComplete="email" />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="organizationName" required>
-              Nombre de la organización
-            </Label>
-            <Input id="organizationName" placeholder="Liga Barrial San José" />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="password" required>
-              Contraseña
-            </Label>
-            <Input id="password" type="password" autoComplete="new-password" />
-            <p className="text-xs text-foreground-subtle">
-              Mínimo 10 caracteres, con mayúscula, minúscula y número.
-            </p>
-          </div>
-          <Button className="w-full">Crear organización</Button>
+        <CardContent>
+          <RegisterForm />
         </CardContent>
       </Card>
 

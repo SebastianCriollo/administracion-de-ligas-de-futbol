@@ -6,9 +6,11 @@ const envSchema = z.object({
   PORT: z.coerce.number().int().default(4000),
   DATABASE_URL: z.string().min(1),
   JWT_SECRET: z.string().min(32).default("dev-secret-change-me-in-production!!"),
-  JWT_ACCESS_TTL: z.string().default("15m"),
+  JWT_ACCESS_TTL_SECONDS: z.coerce.number().int().default(900),
   JWT_REFRESH_TTL_DAYS: z.coerce.number().int().default(30),
   CORS_ORIGIN: z.string().default("http://localhost:3000"),
+  WEB_URL: z.string().default("http://localhost:3000"),
+  GOOGLE_CLIENT_ID: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

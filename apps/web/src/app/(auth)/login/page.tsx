@@ -1,13 +1,10 @@
-import { Button, Card, CardContent, Input, Label, Separator } from "@ligas/ui";
+import { Button, Card, CardContent, Separator } from "@ligas/ui";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { LoginForm } from "@/components/auth/login-form";
 
 export const metadata: Metadata = { title: "Iniciar sesión" };
 
-/**
- * UI de login. El submit se conecta en la Fase 9 (autenticación) —
- * los formularios pasan a React Hook Form + loginSchema de @ligas/contracts.
- */
 export default function LoginPage() {
   return (
     <div>
@@ -27,20 +24,7 @@ export default function LoginPage() {
             <Separator className="flex-1" /> o con tu correo <Separator className="flex-1" />
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="email">Correo electrónico</Label>
-            <Input id="email" type="email" placeholder="tu@correo.com" autoComplete="email" />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password">Contraseña</Label>
-              <Link href="/recuperar" className="text-xs text-primary hover:underline">
-                ¿La olvidaste?
-              </Link>
-            </div>
-            <Input id="password" type="password" autoComplete="current-password" />
-          </div>
-          <Button className="w-full">Iniciar sesión</Button>
+          <LoginForm />
         </CardContent>
       </Card>
 
