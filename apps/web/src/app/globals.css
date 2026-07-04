@@ -1,0 +1,23 @@
+@import "tailwindcss";
+@import "@ligas/ui/styles/tokens.css";
+@import "@ligas/ui/styles/theme.css";
+
+/* Tailwind debe escanear también las clases del design system. */
+@source "../../../../packages/ui/src";
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+  }
+}
