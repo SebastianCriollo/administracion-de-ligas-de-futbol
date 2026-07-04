@@ -71,12 +71,17 @@ export const lineupPlayerSchema = z.object({
 export const submitLineupSchema = z
   .object({
     formation: z.string().regex(/^\d(-\d){1,4}$/).optional(), // "4-3-3"
-    players: z.array(lineupPlayerSchema).min(7).max(30),
+    players: z.array(lineupPlayerSchema).min(4).max(30),
   })
-  .refine((l) => l.players.filter((p) => p.isStarter).length === 11, {
-    message: "La alineación titular debe tener exactamente 11 jugadores",
-    path: ["players"],
-  })
+  // El nº exacto de titulares depende de la modalidad del torneo (11/9/8/7/6/5);
+  // el servicio lo valida contra MODALITY_CONFIG de @ligas/domain.
+  .refine(
+    (l) => {
+      const starters = l.players.filter((p) => p.isStarter).length;
+      return starters >= 4 && starters <= 11;
+    },
+    { message: "Titulares fuera de rango para cualquier modalidad", path: ["players"] },
+  )
   .refine((l) => new Set(l.players.map((p) => p.shirtNumber)).size === l.players.length, {
     message: "Dorsales duplicados en la alineación",
     path: ["players"],

@@ -1,0 +1,10 @@
+{
+  "extends": "@ligas/config/tsconfig/base.json",
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "useDefineForClassFields": false,
+    "noEmit": true
+  },
+  "include": ["src"]
+}

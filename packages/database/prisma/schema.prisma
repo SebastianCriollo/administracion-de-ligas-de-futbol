@@ -197,6 +197,19 @@ enum TournamentFormat {
   CUSTOM // etapas encadenadas personalizadas
 }
 
+// Modalidad de fútbol del torneo. Determina jugadores en cancha, mínimo
+// para no perder por W.O., duración y reglas de cambios (packages/domain).
+enum Modality {
+  FUTBOL_11
+  FUTBOL_9
+  FUTBOL_8
+  FUTBOL_7
+  FUTBOL_6
+  FUTBOL_5
+  FUTSAL
+  BEACH_SOCCER
+}
+
 enum TournamentStatus {
   DRAFT
   PUBLISHED
@@ -212,6 +225,7 @@ model Tournament {
   name           String
   slug           String
   format         TournamentFormat
+  modality       Modality         @default(FUTBOL_11)
   status         TournamentStatus @default(DRAFT)
   logoUrl        String?
   startDate      DateTime?

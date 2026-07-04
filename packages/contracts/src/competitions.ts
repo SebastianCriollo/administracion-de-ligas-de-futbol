@@ -40,6 +40,18 @@ export const tournamentFormatSchema = z.enum([
 ]);
 export type TournamentFormat = z.infer<typeof tournamentFormatSchema>;
 
+export const modalitySchema = z.enum([
+  "FUTBOL_11",
+  "FUTBOL_9",
+  "FUTBOL_8",
+  "FUTBOL_7",
+  "FUTBOL_6",
+  "FUTBOL_5",
+  "FUTSAL",
+  "BEACH_SOCCER",
+]);
+export type Modality = z.infer<typeof modalitySchema>;
+
 export const tiebreakerSchema = z.enum(["POINTS", "GD", "GF", "H2H", "FAIR_PLAY", "DRAW"]);
 export type Tiebreaker = z.infer<typeof tiebreakerSchema>;
 
@@ -65,6 +77,7 @@ export const createTournamentSchema = z
     name: z.string().min(3).max(80),
     slug: slugSchema.optional(),
     format: tournamentFormatSchema,
+    modality: modalitySchema.default("FUTBOL_11"),
     startDate: z.coerce.date().optional(),
     pointsWin: z.number().int().min(0).max(10).default(3),
     pointsDraw: z.number().int().min(0).max(10).default(1),
