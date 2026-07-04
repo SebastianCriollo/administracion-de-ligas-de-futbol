@@ -1,0 +1,7 @@
+import type { HTMLAttributes } from "react";
+import { cn } from "../lib/cn";
+
+/** Placeholder de carga. Regla del sistema: skeletons, nunca spinners de página. */
+export function Skeleton({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn("animate-pulse rounded-md bg-muted", className)} {...props} />;
+}
