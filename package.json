@@ -13,6 +13,9 @@
     "test": "turbo run test",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\""
   },
+  "pnpm": {
+    "onlyBuiltDependencies": ["@prisma/client", "@prisma/engines", "esbuild", "prisma"]
+  },
   "devDependencies": {
     "prettier": "^3.6.2",
     "turbo": "^2.5.8",
