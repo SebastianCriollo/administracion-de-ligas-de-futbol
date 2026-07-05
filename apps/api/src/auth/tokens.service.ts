@@ -65,12 +65,18 @@ export class TokensService {
       throw new UnauthorizedException("Sesión expirada");
     }
     if (stored.revokedAt) {
-      // Reuso de token rotado ⇒ posible robo: revocar toda la familia.
-      await this.prisma.refreshToken.updateMany({
-        where: { userId: stored.userId, revokedAt: null },
-        data: { revokedAt: new Date() },
-      });
-      throw new UnauthorizedException("Sesión revocada por seguridad");
+      // Ventana de gracia (15 s): un reuso inmediato es casi siempre una
+      // carrera legítima (multi-tab, navegación que aborta el Set-Cookie),
+      // no un robo. Se emite un par nuevo sin castigar.
+      const age = Date.now() - stored.revokedAt.getTime();
+      if (age > 15_000) {
+        // Reuso tardío de token rotado ⇒ posible robo: revocar la familia.
+        await this.prisma.refreshToken.updateMany({
+          where: { userId: stored.userId, revokedAt: null },
+          data: { revokedAt: new Date() },
+        });
+        throw new UnauthorizedException("Sesión revocada por seguridad");
+      }
     }
     await this.prisma.refreshToken.update({
       where: { id: stored.id },
