@@ -589,6 +589,11 @@ model VenuePhoto {
 
 // ─── Partidos ────────────────────────────────────────────────────────────
 
+enum SourceTake {
+  WINNER
+  LOSER
+}
+
 enum MatchStatus {
   SCHEDULED
   LIVE
@@ -612,9 +617,13 @@ model Match {
   // Equipos: nullables porque las llaves se generan antes de conocerlos.
   homeTeamId String?
   awayTeamId String?
-  // Progresión de brackets: de qué partidos vienen los participantes.
-  homeSourceMatchId String? @unique
-  awaySourceMatchId String? @unique
+  // Progresión de brackets: de qué partido viene cada participante y si
+  // toma al ganador o al perdedor (tercer puesto). No es único: la final
+  // y el 3er puesto referencian las mismas semifinales.
+  homeSourceMatchId String?
+  awaySourceMatchId String?
+  homeSourceTake    SourceTake @default(WINNER)
+  awaySourceTake    SourceTake @default(WINNER)
   // Posición de la llave dentro de su ronda (para dibujar el bracket).
   bracketSlot Int?
 
@@ -649,8 +658,8 @@ model Match {
   awayTeam        Team?           @relation("AwayTeam", fields: [awayTeamId], references: [id], onDelete: Restrict)
   homeSourceMatch Match?          @relation("HomeSource", fields: [homeSourceMatchId], references: [id], onDelete: SetNull)
   awaySourceMatch Match?          @relation("AwaySource", fields: [awaySourceMatchId], references: [id], onDelete: SetNull)
-  homeFeedsInto   Match?          @relation("HomeSource")
-  awayFeedsInto   Match?          @relation("AwaySource")
+  homeFeedsInto   Match[]         @relation("HomeSource")
+  awayFeedsInto   Match[]         @relation("AwaySource")
   venue           Venue?          @relation(fields: [venueId], references: [id], onDelete: SetNull)
   bestPlayer      Player?         @relation("BestPlayer", fields: [bestPlayerId], references: [id], onDelete: SetNull)
   events          MatchEvent[]

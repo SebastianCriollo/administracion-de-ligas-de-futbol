@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Badge,
   Button,
@@ -6,107 +8,158 @@ import {
   CardHeader,
   CardTitle,
   LiveIndicator,
+  Skeleton,
 } from "@ligas/ui";
-import { ArrowUpRight, Plus, Shield, ShieldCheck, Trophy, Users } from "lucide-react";
-import type { Metadata } from "next";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowUpRight, CalendarDays, Plus, Shield, ShieldCheck, Trophy, Users } from "lucide-react";
+import Link from "next/link";
+import { authedApi } from "@/lib/api";
+import { useSession } from "@/lib/session";
 
-export const metadata: Metadata = { title: "Dashboard" };
+interface Dashboard {
+  kpis: {
+    tournaments: number;
+    teams: number;
+    players: number;
+    referees: number;
+    upcoming: number;
+    live: number;
+  };
+  todayMatches: {
+    id: string;
+    status: string;
+    minute: number | null;
+    scheduledAt: string | null;
+    homeScore: number | null;
+    awayScore: number | null;
+    homeTeam: { name: string } | null;
+    awayTeam: { name: string } | null;
+    tournament: { name: string };
+  }[];
+}
 
-/**
- * Dashboard del LEAGUE_ADMIN.
- * Datos demo estáticos hasta la Fase 10, cuando este page consume
- * GET /orgs/{orgId}/dashboard — el layout y los componentes son finales.
- */
-
-const KPIS = [
-  { label: "Torneos activos", value: "4", delta: "+1 este mes", icon: Trophy },
-  { label: "Equipos", value: "32", delta: "+3 este mes", icon: Shield },
-  { label: "Jugadores", value: "486", delta: "+24 este mes", icon: Users },
-  { label: "Árbitros", value: "12", delta: "estable", icon: ShieldCheck },
-] as const;
-
-const TODAY_MATCHES = [
-  { time: "14:00", home: "Leones FC", away: "Águilas United", status: "scheduled" },
-  { time: "71'", home: "Tigres del Sur", away: "Pumas SC", score: "2 - 1", status: "live" },
-  { time: "Final", home: "Osos Negros", away: "Halcones", score: "0 - 3", status: "finished" },
-] as const;
+const LIVE_STATUSES = ["LIVE", "HALF_TIME", "EXTRA_TIME", "PENALTIES"];
 
 export default function DashboardPage() {
+  const { orgId, orgName, me } = useSession();
+  const { data, isLoading } = useQuery({
+    queryKey: ["dashboard", orgId],
+    queryFn: () => authedApi<Dashboard>(`/orgs/${orgId}/dashboard`),
+    refetchInterval: 30_000,
+  });
+
+  const kpis = [
+    { label: "Torneos activos", value: data?.kpis.tournaments, icon: Trophy, href: "/app/torneos" },
+    { label: "Equipos", value: data?.kpis.teams, icon: Shield, href: "/app/equipos" },
+    { label: "Jugadores", value: data?.kpis.players, icon: Users, href: "/app/jugadores" },
+    { label: "Árbitros", value: data?.kpis.referees, icon: ShieldCheck, href: "/app/arbitros" },
+  ];
+
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
-      {/* Encabezado */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-sm text-foreground-muted">Liga Deportiva Demo · Apertura 2026</p>
+          <h1 className="text-2xl font-bold tracking-tight">Hola, {me.firstName}</h1>
+          <p className="text-sm text-foreground-muted">{orgName}</p>
         </div>
-        <Button>
-          <Plus className="size-4" />
-          Crear torneo
-        </Button>
+        <Link href="/app/torneos/nuevo">
+          <Button>
+            <Plus className="size-4" /> Crear torneo
+          </Button>
+        </Link>
       </div>
 
-      {/* KPIs */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {KPIS.map((kpi) => (
-          <Card key={kpi.label}>
-            <CardContent className="flex items-start justify-between">
-              <div>
-                <p className="text-sm text-foreground-muted">{kpi.label}</p>
-                <p className="mt-1 font-mono text-3xl font-bold tabular-nums">{kpi.value}</p>
-                <p className="mt-1 text-xs text-foreground-subtle">{kpi.delta}</p>
-              </div>
-              <kpi.icon className="size-5 text-foreground-subtle" aria-hidden="true" />
-            </CardContent>
-          </Card>
+        {kpis.map((kpi) => (
+          <Link key={kpi.label} href={kpi.href}>
+            <Card className="transition-shadow hover:shadow-md">
+              <CardContent className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-foreground-muted">{kpi.label}</p>
+                  {isLoading ? (
+                    <Skeleton className="mt-2 h-8 w-12" />
+                  ) : (
+                    <p className="mt-1 font-mono text-3xl font-bold tabular-nums">{kpi.value}</p>
+                  )}
+                </div>
+                <kpi.icon className="size-5 text-foreground-subtle" aria-hidden="true" />
+              </CardContent>
+            </Card>
+          </Link>
         ))}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Partidos de hoy */}
         <Card className="lg:col-span-2">
           <CardHeader className="flex-row items-center justify-between">
             <CardTitle>Partidos de hoy</CardTitle>
-            <Badge variant="neutral">{TODAY_MATCHES.length}</Badge>
+            <Badge variant="neutral">{data?.todayMatches.length ?? 0}</Badge>
           </CardHeader>
-          <CardContent className="flex flex-col divide-y divide-border">
-            {TODAY_MATCHES.map((m) => (
-              <div key={`${m.home}-${m.away}`} className="flex items-center gap-4 py-3 first:pt-0 last:pb-0">
-                <div className="w-14 shrink-0 text-center">
-                  {m.status === "live" ? (
-                    <LiveIndicator minute={m.time} />
-                  ) : (
-                    <span className="font-mono text-sm tabular-nums text-foreground-muted">
-                      {m.time}
-                    </span>
-                  )}
-                </div>
-                <div className="flex min-w-0 flex-1 items-center justify-between gap-3 text-sm">
-                  <span className="truncate font-medium">{m.home}</span>
-                  <span className="shrink-0 font-mono font-bold tabular-nums">
-                    {"score" in m ? m.score : "vs"}
-                  </span>
-                  <span className="truncate text-right font-medium">{m.away}</span>
-                </div>
+          <CardContent>
+            {isLoading ? (
+              <div className="flex flex-col gap-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton key={i} className="h-10" />
+                ))}
               </div>
-            ))}
+            ) : !data?.todayMatches.length ? (
+              <div className="flex flex-col items-center gap-2 py-10 text-center">
+                <CalendarDays className="size-8 text-foreground-subtle" />
+                <p className="text-sm text-foreground-muted">No hay partidos programados para hoy.</p>
+              </div>
+            ) : (
+              <div className="flex flex-col divide-y divide-border">
+                {data.todayMatches.map((m) => (
+                  <div key={m.id} className="flex items-center gap-4 py-3 first:pt-0 last:pb-0">
+                    <div className="w-16 shrink-0 text-center">
+                      {LIVE_STATUSES.includes(m.status) ? (
+                        <LiveIndicator minute={m.minute ? `${m.minute}'` : undefined} />
+                      ) : m.status === "FINISHED" ? (
+                        <span className="text-xs font-medium text-foreground-subtle">Final</span>
+                      ) : (
+                        <span className="font-mono text-sm tabular-nums text-foreground-muted">
+                          {m.scheduledAt
+                            ? new Date(m.scheduledAt).toLocaleTimeString("es", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })
+                            : "—"}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex min-w-0 flex-1 items-center justify-between gap-3 text-sm">
+                      <span className="truncate font-medium">{m.homeTeam?.name ?? "Por definir"}</span>
+                      <span className="shrink-0 font-mono font-bold tabular-nums">
+                        {m.homeScore !== null ? `${m.homeScore} - ${m.awayScore}` : "vs"}
+                      </span>
+                      <span className="truncate text-right font-medium">
+                        {m.awayTeam?.name ?? "Por definir"}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Accesos rápidos */}
         <Card>
           <CardHeader>
             <CardTitle>Accesos rápidos</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-2">
-            {["Programar partido", "Registrar equipo", "Designar árbitro", "Publicar noticia"].map(
-              (label) => (
-                <Button key={label} variant="outline" className="justify-between">
-                  {label}
+            {[
+              { label: "Nuevo torneo", href: "/app/torneos/nuevo" },
+              { label: "Registrar equipo", href: "/app/equipos" },
+              { label: "Ver torneos", href: "/app/torneos" },
+            ].map((a) => (
+              <Link key={a.href + a.label} href={a.href}>
+                <Button variant="outline" className="w-full justify-between">
+                  {a.label}
                   <ArrowUpRight className="size-4 text-foreground-subtle" />
                 </Button>
-              ),
-            )}
+              </Link>
+            ))}
           </CardContent>
         </Card>
       </div>

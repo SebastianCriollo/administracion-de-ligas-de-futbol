@@ -2,13 +2,14 @@ import { Module } from "@nestjs/common";
 import { AuthModule } from "./auth/auth.module";
 import { HealthController } from "./health/health.controller";
 import { PrismaService } from "./infrastructure/prisma.service";
+import { AdminModule } from "./modules/admin.module";
 
 /**
- * Módulo raíz. Los módulos de negocio (tournaments, matches…) se
- * registran aquí a medida que se implementan (Fases 10-11).
+ * Módulo raíz. Los módulos deportivos (matches, standings en vivo…)
+ * se registran en la Fase 11.
  */
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, AdminModule],
   controllers: [HealthController],
   providers: [PrismaService],
 })
