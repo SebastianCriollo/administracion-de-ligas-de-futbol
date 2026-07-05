@@ -1,0 +1,141 @@
+/**
+ * Design tokens — Plataforma de Ligas de Fútbol
+ *
+ * Fuente de verdad de color, tipografía, espaciado, radios, sombras y motion.
+ * Los valores de color usan OKLCH (percepción uniforme, contraste predecible).
+ * El tema oscuro NO es una inversión: cada token se ajustó a mano.
+ *
+ * Convención: los componentes solo consumen tokens semánticos (--color-*),
+ * nunca valores crudos.
+ */
+
+:root {
+  /* ── Marca ──────────────────────────────────────────────── */
+  /* Verde césped, serio y saturado con moderación (tono Stripe/Linear). */
+  --color-primary: oklch(0.55 0.14 155);
+  --color-primary-hover: oklch(0.5 0.14 155);
+  --color-primary-foreground: oklch(0.99 0 0);
+  --color-primary-subtle: oklch(0.96 0.03 155);
+
+  /* ── Superficies ────────────────────────────────────────── */
+  --color-background: oklch(0.985 0.002 250); /* fondo app */
+  --color-surface: oklch(1 0 0); /* cards */
+  --color-surface-raised: oklch(1 0 0); /* modales, popovers */
+  --color-muted: oklch(0.955 0.004 250); /* fondos secundarios, hovers */
+
+  /* ── Texto ──────────────────────────────────────────────── */
+  --color-foreground: oklch(0.2 0.01 260);
+  --color-foreground-muted: oklch(0.5 0.012 260);
+  --color-foreground-subtle: oklch(0.65 0.01 260);
+
+  /* ── Bordes y foco ──────────────────────────────────────── */
+  --color-border: oklch(0.91 0.005 260);
+  --color-border-strong: oklch(0.85 0.006 260);
+  --color-ring: oklch(0.55 0.14 155 / 0.45);
+
+  /* ── Semánticos deportivos ──────────────────────────────── */
+  --color-success: oklch(0.6 0.14 150); /* victoria, activo */
+  --color-success-subtle: oklch(0.95 0.04 150);
+  --color-warning: oklch(0.8 0.16 85); /* tarjeta amarilla, alerta */
+  --color-warning-subtle: oklch(0.97 0.06 95);
+  --color-danger: oklch(0.58 0.21 25); /* tarjeta roja, derrota, destructivo */
+  --color-danger-subtle: oklch(0.96 0.03 25);
+  --color-info: oklch(0.58 0.13 245); /* neutral informativo, playoff */
+  --color-info-subtle: oklch(0.95 0.03 245);
+  --color-live: oklch(0.6 0.23 27); /* partido EN VIVO (rojo pulsante) */
+  --color-draw: oklch(0.65 0.01 260); /* empate */
+
+  /* ── Tipografía ─────────────────────────────────────────── */
+  --font-sans: "Inter", "Inter Fallback", system-ui, -apple-system, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", monospace; /* marcadores, cronómetro, tablas numéricas */
+
+  --text-xs: 0.75rem; /* 12 — metadatos, badges */
+  --text-sm: 0.875rem; /* 14 — cuerpo denso (tablas) */
+  --text-base: 1rem; /* 16 — cuerpo */
+  --text-lg: 1.125rem; /* 18 — subtítulos */
+  --text-xl: 1.25rem; /* 20 — título de card */
+  --text-2xl: 1.5rem; /* 24 — título de página */
+  --text-3xl: 1.875rem; /* 30 — hero dashboard */
+  --text-scoreboard: 2.5rem; /* 40 — marcador de partido */
+
+  /* ── Espaciado (base 4px) ───────────────────────────────── */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* ── Radios ─────────────────────────────────────────────── */
+  --radius-sm: 0.375rem; /* inputs, badges */
+  --radius-md: 0.5rem; /* botones */
+  --radius-lg: 0.75rem; /* cards */
+  --radius-xl: 1rem; /* modales */
+  --radius-full: 9999px; /* avatares, pills */
+
+  /* ── Elevación (sombras suaves, nunca duras) ────────────── */
+  --shadow-sm: 0 1px 2px oklch(0.2 0.01 260 / 0.05);
+  --shadow-md: 0 2px 8px oklch(0.2 0.01 260 / 0.07), 0 1px 2px oklch(0.2 0.01 260 / 0.05);
+  --shadow-lg: 0 8px 24px oklch(0.2 0.01 260 / 0.1), 0 2px 6px oklch(0.2 0.01 260 / 0.06);
+
+  /* ── Motion ─────────────────────────────────────────────── */
+  --duration-fast: 120ms; /* hovers, toggles */
+  --duration-base: 180ms; /* transiciones estándar */
+  --duration-slow: 280ms; /* modales, drawers */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* ── Tema oscuro (alto contraste tipo Vercel/Sofascore) ───── */
+.dark {
+  --color-primary: oklch(0.72 0.15 155);
+  --color-primary-hover: oklch(0.78 0.15 155);
+  --color-primary-foreground: oklch(0.15 0.02 155);
+  --color-primary-subtle: oklch(0.28 0.05 155);
+
+  --color-background: oklch(0.17 0.008 260);
+  --color-surface: oklch(0.21 0.008 260);
+  --color-surface-raised: oklch(0.25 0.01 260);
+  --color-muted: oklch(0.26 0.008 260);
+
+  --color-foreground: oklch(0.93 0.004 260);
+  --color-foreground-muted: oklch(0.68 0.008 260);
+  --color-foreground-subtle: oklch(0.55 0.008 260);
+
+  --color-border: oklch(0.3 0.008 260);
+  --color-border-strong: oklch(0.38 0.01 260);
+  --color-ring: oklch(0.72 0.15 155 / 0.5);
+
+  --color-success: oklch(0.72 0.14 150);
+  --color-success-subtle: oklch(0.3 0.05 150);
+  --color-warning: oklch(0.82 0.16 85);
+  --color-warning-subtle: oklch(0.32 0.06 95);
+  --color-danger: oklch(0.68 0.19 25);
+  --color-danger-subtle: oklch(0.3 0.06 25);
+  --color-info: oklch(0.7 0.12 245);
+  --color-info-subtle: oklch(0.3 0.05 245);
+  --color-live: oklch(0.68 0.21 27);
+  --color-draw: oklch(0.6 0.008 260);
+
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.3);
+  --shadow-md: 0 2px 8px oklch(0 0 0 / 0.35), 0 1px 2px oklch(0 0 0 / 0.3);
+  --shadow-lg: 0 8px 24px oklch(0 0 0 / 0.45), 0 2px 6px oklch(0 0 0 / 0.35);
+}
+
+/* Respeta la preferencia del SO cuando no hay elección explícita del usuario. */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light):not(.dark) {
+    color-scheme: dark;
+  }
+}
+
+/* Usuarios con motion reducido: sin animaciones decorativas. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+    --duration-slow: 0ms;
+  }
+}
