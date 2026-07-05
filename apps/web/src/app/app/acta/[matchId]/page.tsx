@@ -15,7 +15,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeftRight, CircleAlert, Goal, Square } from "lucide-react";
 import { use, useState } from "react";
-import { ApiRequestError, authedApi } from "@/lib/api";
+import { ApiRequestError, authedApi, downloadFile } from "@/lib/api";
 import { useSession } from "@/lib/session";
 
 /**
@@ -154,9 +154,20 @@ export default function ActaPage({ params }: { params: Promise<{ matchId: string
             <Badge variant={m.status === "FINISHED" ? "outline" : "info"}>{m.status}</Badge>
           )}
           {closed && (
-            <Badge variant="success" dot>
-              Acta cerrada
-            </Badge>
+            <>
+              <Badge variant="success" dot>
+                Acta cerrada
+              </Badge>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  downloadFile(`/orgs/${orgId}/reports/match/${matchId}/acta`, `acta-${matchId}.pdf`)
+                }
+              >
+                Descargar acta oficial (PDF)
+              </Button>
+            </>
           )}
         </CardContent>
       </Card>

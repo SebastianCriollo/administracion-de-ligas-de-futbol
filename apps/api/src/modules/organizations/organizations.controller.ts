@@ -1,14 +1,58 @@
-import { Controller, Get, Inject, Param, Query } from "@nestjs/common";
-import { auditQuerySchema } from "@ligas/contracts";
+import { randomBytes, createHash } from "node:crypto";
+import { Body, Controller, Get, Inject, Param, Post, Query } from "@nestjs/common";
+import { auditQuerySchema, inviteMemberSchema } from "@ligas/contracts";
 import type { z } from "zod";
 import { Roles } from "../../auth/decorators";
 import { ZodValidationPipe } from "../../common/zod-validation.pipe";
+import { loadEnv } from "../../config/env";
+import { MailService } from "../../infrastructure/mail.service";
 import { PrismaService } from "../../infrastructure/prisma.service";
+
+const ROLE_LABEL: Record<string, string> = {
+  LEAGUE_ADMIN: "administrador de liga",
+  REFEREE: "árbitro",
+  TEAM_MANAGER: "director técnico",
+  PLAYER: "jugador",
+};
 
 @Roles("LEAGUE_ADMIN")
 @Controller("orgs/:orgId")
 export class OrganizationsController {
-  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
+  private readonly env = loadEnv();
+
+  constructor(
+    @Inject(PrismaService) private readonly prisma: PrismaService,
+    @Inject(MailService) private readonly mail: MailService,
+  ) {}
+
+  /** Invita a un miembro (DT/árbitro/jugador/admin) con email real. */
+  @Post("invitations")
+  async invite(
+    @Param("orgId") orgId: string,
+    @Body(new ZodValidationPipe(inviteMemberSchema)) body: z.infer<typeof inviteMemberSchema>,
+  ) {
+    const org = await this.prisma.organization.findUniqueOrThrow({ where: { id: orgId } });
+    const raw = randomBytes(32).toString("base64url");
+    const invitation = await this.prisma.invitation.create({
+      data: {
+        organizationId: orgId,
+        email: body.email,
+        role: body.role,
+        teamId: body.teamId,
+        playerId: body.playerId,
+        refereeId: body.refereeId,
+        tokenHash: createHash("sha256").update(raw).digest("hex"),
+        expiresAt: new Date(Date.now() + 7 * 86_400_000),
+      },
+    });
+    await this.mail.send(
+      body.email,
+      `Invitación a ${org.name}`,
+      `Te invitaron como ${ROLE_LABEL[body.role]} en ${org.name}.\n` +
+        `Activa tu cuenta (expira en 7 días): ${this.env.WEB_URL}/invitacion/${raw}`,
+    );
+    return { id: invitation.id, email: invitation.email, role: invitation.role };
+  }
 
   /** KPIs del dashboard (Fase 3 §4.1). */
   @Get("dashboard")

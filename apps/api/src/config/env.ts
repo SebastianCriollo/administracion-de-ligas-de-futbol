@@ -11,6 +11,8 @@ const envSchema = z.object({
   CORS_ORIGIN: z.string().default("http://localhost:3000"),
   WEB_URL: z.string().default("http://localhost:3000"),
   GOOGLE_CLIENT_ID: z.string().optional(),
+  RESEND_API_KEY: z.string().optional(),
+  MAIL_FROM: z.string().default("Ligas <noreply@ligas.app>"),
 });
 
 export type Env = z.infer<typeof envSchema>;
