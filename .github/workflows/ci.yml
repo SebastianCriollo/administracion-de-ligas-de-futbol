@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ligas_test?schema=public
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ligas_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck (todos los paquetes)
+        run: pnpm typecheck
+
+      - name: Tests del motor de competición (@ligas/domain)
+        run: pnpm --filter @ligas/domain test
+
+      - name: Migraciones sobre Postgres de CI
+        run: pnpm --filter @ligas/database exec prisma migrate deploy
+
+      - name: Tests de integración de la API (Supertest + Postgres real)
+        run: pnpm --filter @ligas/api test
+
+      - name: Build del frontend
+        run: pnpm --filter @ligas/web build
+
+      - name: Instalar Chromium de Playwright
+        run: pnpm --filter @ligas/web exec playwright install --with-deps chromium
+
+      - name: E2E (Playwright levanta API y web)
+        run: pnpm --filter @ligas/web exec playwright test
+        env:
+          NODE_ENV: test
+          JWT_SECRET: ci-secret-para-integracion-32chars!!
+
+      - name: Subir evidencias E2E si fallan
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results
+          path: apps/web/test-results/
+          retention-days: 7

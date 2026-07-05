@@ -240,13 +240,15 @@ export class MatchesService {
     const count = (teamId: string | null, types: readonly string[]) =>
       match.events.filter((e) => e.teamId === teamId && types.includes(e.type)).length;
 
+    // Los penales existen (aunque sean 0) solo si hubo tanda.
+    const hadShootout = match.events.some((e) => e.type.startsWith("SHOOTOUT_"));
     await this.prisma.match.update({
       where: { id: matchId },
       data: {
         homeScore: count(match.homeTeamId, GOAL_TYPES),
         awayScore: count(match.awayTeamId, GOAL_TYPES),
-        homePenalties: count(match.homeTeamId, ["SHOOTOUT_GOAL"]) || null,
-        awayPenalties: count(match.awayTeamId, ["SHOOTOUT_GOAL"]) || null,
+        homePenalties: hadShootout ? count(match.homeTeamId, ["SHOOTOUT_GOAL"]) : null,
+        awayPenalties: hadShootout ? count(match.awayTeamId, ["SHOOTOUT_GOAL"]) : null,
       },
     });
   }
