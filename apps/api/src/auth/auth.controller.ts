@@ -24,6 +24,7 @@ import {
   type RegisterInput,
   type ResetPasswordInput,
 } from "@ligas/contracts";
+import { Throttle } from "@nestjs/throttler";
 import type { Request, Response } from "express";
 import { ZodValidationPipe } from "../common/zod-validation.pipe";
 import { loadEnv } from "../config/env";
@@ -31,6 +32,10 @@ import { AuthService } from "./auth.service";
 import { CurrentUser, Public } from "./decorators";
 import { REFRESH_COOKIE, TokensService } from "./tokens.service";
 
+// Fuerza bruta: máximo 10 intentos/min por IP en todo /auth.
+@Throttle({
+  default: { ttl: 60_000, limit: process.env.NODE_ENV === "test" ? 100_000 : 10 },
+})
 @Controller("auth")
 export class AuthController {
   private readonly env = loadEnv();
