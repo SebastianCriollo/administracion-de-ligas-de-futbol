@@ -20,12 +20,12 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
-    "@prisma/client": "^6.19.1"
+    "@prisma/client": "^6.19.1",
+    "prisma": "^6.19.1"
   },
   "devDependencies": {
     "@ligas/config": "workspace:*",
     "@types/node": "^26.1.0",
-    "prisma": "^6.19.1",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   }
