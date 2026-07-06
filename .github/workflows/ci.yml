@@ -39,6 +39,14 @@ jobs:
       - name: Instalar dependencias
         run: pnpm install --frozen-lockfile
 
+      - name: Generar Prisma Client
+        # El postinstall automático de @prisma/client busca el schema en
+        # rutas relativas a la raíz del monorepo y no lo encuentra ahí
+        # (vive en packages/database/prisma), así que genera un cliente
+        # vacío. Sin este paso explícito, el typecheck de @ligas/database
+        # falla porque los enums del modelo no existen en el cliente.
+        run: pnpm --filter @ligas/database generate
+
       - name: Typecheck (todos los paquetes)
         run: pnpm typecheck
 
